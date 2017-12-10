@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,12 +83,32 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyViewHo
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
-                return null;
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    contactListFiltered = contactList;
+                } else {
+                    List<Contact> filteredList = new ArrayList<>();
+                    for (Contact row : contactList) {
+
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or phone number match
+                        if (row.getName().toLowerCase().contains(charString.toLowerCase()) || row.getPhone().contains(charSequence)) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    contactListFiltered = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = contactListFiltered;
+                return filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-
+                contactListFiltered = (ArrayList<Contact>) filterResults.values;
+                notifyDataSetChanged();
             }
         };
     }
